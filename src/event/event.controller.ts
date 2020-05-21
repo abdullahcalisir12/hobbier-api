@@ -1,17 +1,18 @@
 import { Controller, Get, Post, Delete, Param } from '@nestjs/common';
 import { EventService } from './event.service';
+import { Event } from './event.entity';
 
 @Controller('events')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
   @Get()
-  getEvents(): {}[] {
+  getEvents(): Promise<Event[]> {
     return this.eventService.getEvents();
   }
 
   @Get(':event_id')
-  getEventById(@Param() params): {} {
+  getEventById(@Param() params): Promise<Event> {
     return this.eventService.getEventById(+params.event_id);
   }
 
@@ -19,13 +20,14 @@ export class EventController {
   createEvent(): {} {
     const newEvent = {
       name: 'Swimming',
-      address: 'Poland'
+      address: 'Poland',
+      description: 'Swimming'
     }
     return this.eventService.createEvent(newEvent);
   }
 
-  @Delete()
-  deleteEvent(): {}[] {
-    return this.eventService.deleteEvent(1);
+  @Delete(':event_id')
+  deleteEvent(@Param() params) {
+    return this.eventService.deleteEvent(+params.event_id);
   }
 }

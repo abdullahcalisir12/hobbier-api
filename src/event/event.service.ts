@@ -1,40 +1,31 @@
 import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
-const events = [
-  {
-    name: 'Basketball',
-    id: 1,
-    address: 'Batman'
-  },
-  {
-    name: 'Football',
-    id: 2,
-    address: 'Mugla'
-  },
-  {
-    name: 'Tennis',
-    id: 3,
-    address: 'Istanbul'
-  }
-];
+import { Event } from './event.entity';
 
 @Injectable()
 export class EventService {
-  getEvents(): {}[] {
-    return events;
+
+  constructor(
+    @InjectRepository(Event)
+    private eventRepository: Repository<Event>
+  ) {}
+
+  getEvents(): Promise<Event[]> {
+    return this.eventRepository.find();
   }
 
-  getEventById(eventId) {
-    return events.find(event => event.id === eventId)
+  getEventById(eventId: number): Promise<Event> {
+    return this.eventRepository.findOne(eventId);
   }
 
-  createEvent(event): {} {
-    event.id = events.length + 1;
-    events.push(event);
-    return events;
+  createEvent(event: Event) {
+    return this.eventRepository.save(event);
   }
 
-  deleteEvent(eventId) {
-    return events.splice(events.findIndex(event => event.id === eventId), 1);
+  async deleteEvent(eventId) {
+    const event = await this.eventRepository.findOne(eventId);
+    this.eventRepository.remove(event);
   }
 }
