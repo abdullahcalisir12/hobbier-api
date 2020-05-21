@@ -1,25 +1,28 @@
 import { Injectable } from '@nestjs/common';
-
-const users = [
-  {
-    name: 'Basketball',
-    id: 1,
-    password: 'Batman'
-  },
-  {
-    name: 'Football',
-    id: 2,
-    password: 'Mugla'
-  },
-];
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class AuthService {
-  signIn() {
-    return 'Sign In';
+  constructor(private userService: UserService){}
+
+  signIn(user) {
+    return user;
   }
 
   signUp() {
     return 'Sign Up';
   }
+
+  async validateUser(username: string, password: string): Promise<any> {
+    const user = await this.userService.findOne(username);
+
+    if (user && user.password === password) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
 }
+
+
+// To do => use bcrypt later
