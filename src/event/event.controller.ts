@@ -1,36 +1,38 @@
-import { Controller, Get, Post, Delete, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, UseGuards, Body, Request } from '@nestjs/common';
 import { EventService } from './event.service';
 import { Event } from './event.entity';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
+@UseGuards(JwtAuthGuard)
 @Controller('events')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
-  @UseGuards(JwtAuthGuard)
   @Get()
-  getEvents(): Promise<Event[]> {
-    return this.eventService.getEvents();
+  getEvents(@Request() req): Promise<Event[]> {
+    return this.eventService.getEvents(req.user);
   }
 
   @Get(':event_id')
-  getEventById(@Param() params): Promise<Event> {
-    return this.eventService.getEventById(+params.event_id);
+  getEventById(@Param() params, @Request() req): Promise<Event> {
+    return this.eventService.getEventById(+params.event_id, req.user);
   }
 
   @Post()
-  createEvent(): {} {
+  createEvent(@Body() body, @Request() req): Promise<Event> {
     const newEvent = {
-      name: 'Swimming',
-      address: 'Poland',
-      description: 'Swimming'
+      name: body.name,
+      address: body.address,
+      description: body.description,
+      user: req.user
     }
+    
     return this.eventService.createEvent(newEvent);
   }
 
   @Delete(':event_id')
-  deleteEvent(@Param() params) {
-    return this.eventService.deleteEvent(+params.event_id);
+  deleteEvent(@Param() params, @Request() req) {
+    return this.eventService.deleteEvent(+params.event_id, req.user);
   }
 }

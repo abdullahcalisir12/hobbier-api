@@ -12,20 +12,20 @@ export class EventService {
     private eventRepository: Repository<Event>
   ) {}
 
-  getEvents(): Promise<Event[]> {
-    return this.eventRepository.find();
+  getEvents(user): Promise<Event[]> {
+    return this.eventRepository.find({ where: { user: { id: user.id }}, relations: ["user"] });
   }
 
-  getEventById(eventId: number): Promise<Event> {
-    return this.eventRepository.findOne(eventId);
+  getEventById(eventId: number, user): Promise<Event> {
+    return this.eventRepository.findOne({where: { id: eventId, user: {id: user.id} }});
   }
 
   createEvent(event: Event) {
     return this.eventRepository.save(event);
   }
 
-  async deleteEvent(eventId) {
-    const event = await this.eventRepository.findOne(eventId);
+  async deleteEvent(eventId: number, user) {
+    const event = await this.eventRepository.findOne({where: { id: eventId, user: {id: user.id} }});
     this.eventRepository.remove(event);
   }
 }

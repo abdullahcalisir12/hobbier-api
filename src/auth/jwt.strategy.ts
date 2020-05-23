@@ -7,7 +7,7 @@ import { jwtConstants } from "./constant";
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromUrlQueryParameter('access_token'),
       ignoreExpiration: false,
       secretOrKey: jwtConstants.secret
     })
@@ -15,8 +15,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: any) {
     return {
-      userId: payload.sub,
-      username: payload.username
+      name: payload.name,
+      username: payload.username,
+      id: payload.id
     }
   }
 }

@@ -12,7 +12,7 @@ import { AppService } from './app.service';
 import { EventModule } from './event/event.module';
 import { AuthModule } from './auth/auth.module';
 
-import { Event } from './event/event.entity'; 
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -20,7 +20,7 @@ import { Event } from './event/event.entity';
       type: 'postgres',
       url: process.env.DB_PG_URL,
       synchronize: true,
-      entities: [Event],
+      autoLoadEntities: true,
       extra: {
         ssl: {
           rejectUnauthorized: false
@@ -28,7 +28,8 @@ import { Event } from './event/event.entity';
       }
     }),
     AuthModule,
-    EventModule
+    EventModule,
+    UserModule
   ],
   controllers: [AppController],
   providers: [AppService],
