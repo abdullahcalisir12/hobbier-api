@@ -2,7 +2,6 @@ import { IsString, MaxLength, MinLength, IsNumber, IsNumberString } from "class-
 import { User } from "src/user/user.entitiy";
 
 export class CreateEventDTO {
-  
   @IsString()
   @MaxLength(64)
   @MinLength(4)
