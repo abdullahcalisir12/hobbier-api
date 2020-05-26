@@ -17,7 +17,7 @@ export class AuthService {
       };
     } catch (error) {
       throw InternalServerErrorException;
-    } 
+    }
   }
 
   signUp(credentials: SignUpDTO): Promise<any> {
@@ -41,6 +41,3 @@ export class AuthService {
     return null;
   }
 }
-
-
-// To do => use bcrypt later

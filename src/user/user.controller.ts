@@ -1,7 +1,9 @@
-import { Controller, Get, UseGuards, Param, Delete } from "@nestjs/common";
+import { Controller, Get, UseGuards, Param, Delete, Request, UnauthorizedException } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { User } from "./user.entitiy";
+import { JwtAuthGuard } from "src/auth/jwt-auth.guard";
 
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
@@ -17,7 +19,11 @@ export class UserController {
   }
 
   @Delete('/:user_id')
-  deleteUser(@Param() params): Promise<any> {
+  deleteUser(@Param() params, @Request() req): Promise<any> {
+    if (params.user_id !== req.user.id) {
+      throw new UnauthorizedException();
+    }
+    
     return this.userService.deleteUser(params.user_id);
   }
  }

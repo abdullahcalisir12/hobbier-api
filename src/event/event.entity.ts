@@ -13,7 +13,7 @@ export class Event {
   description: string;
 
   @Column()
-  address: string;
+  location: string;
 
   @ManyToOne(type => User, user => user.events)
   user: User
