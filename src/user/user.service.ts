@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, ConflictException, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
@@ -13,20 +13,52 @@ export class UserService {
     private userRepository: Repository<User>
   ) {}
 
-  getUsers(): Promise<User[]> {
-    return this.userRepository.find();
+  async getUsers(): Promise<User[]> {
+    try {
+      return await this.userRepository.find();
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 
-  getSingleUser(uniqueUserCredential): Promise<User | undefined> {
-    return this.userRepository.findOne(uniqueUserCredential);
+  async getUserById(userId): Promise<User | undefined> {
+    try {
+      return await this.userRepository.findOne(userId);
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 
-  createUser(user: SignUpDTO) {
-    return this.userRepository.save(user);
+  async getUserByUserName(username: string): Promise<User | undefined> {
+    const user = await this.userRepository.findOne({where: {username}})
+      .catch(error => {
+        throw new NotFoundException();
+      });
+    return user;
+  }
+
+  async createUser(userDto: SignUpDTO): Promise<User> {
+    const { email, username } = userDto;
+    let user = await this.userRepository.findOne({where: [{email}, {username}]});
+
+    if (user) {
+      throw new BadRequestException('E-mail or username is already in use');
+    }
+    user = await this.userRepository.create(userDto);
+    return this.userRepository.save(user)
+      .catch(error => {
+        throw new InternalServerErrorException(error);
+      });
   }
 
   async deleteUser(userId: number) {
-    const user = await this.userRepository.findOne(userId);
-    this.userRepository.remove(user);
+    try {
+      const user = await this.userRepository.findOne(userId);
+      if (user) {
+        return this.userRepository.remove(user);
+      }
+    } catch (error) {
+      throw new InternalServerErrorException(error);
+    }
   }
 }

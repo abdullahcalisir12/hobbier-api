@@ -14,8 +14,8 @@ export class UserController {
   }
 
   @Get('/:user_id')
-  getUserById(@Param() params): Promise<User> {
-    return this.userService.getSingleUser({ id: +params.user_id });
+  getUserById(@Param() params): Promise<User | undefined> {
+    return this.userService.getUserById(+params.user_id);
   }
 
   @Delete('/:user_id')
