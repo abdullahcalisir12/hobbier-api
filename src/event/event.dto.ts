@@ -14,9 +14,6 @@ export class CreateEventDTO {
 
   @IsString()
   location: string;
-
-  @IsNumberString()
-  user: User;
 }
 
 export class UpdateEventDTO extends CreateEventDTO {

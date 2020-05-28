@@ -18,11 +18,19 @@ export class EventService {
   }
 
   getEventById(eventId: number): Promise<Event> {
-    return this.eventRepository.findOne({where: {id: eventId}, relations: ["user"]});
+    const event = this.eventRepository.findOne({where: {id: eventId}, relations: ["user"]});
+    if (!event) {
+      throw new NotFoundException('Event Not Found');
+    }
+    return event;
   }
 
-  createEvent(event: CreateEventDTO): Promise<Event> {
-    return this.eventRepository.save(event);
+  async createEvent(event: CreateEventDTO, user): Promise<Event> {
+    const newEvent = {
+      ...event,
+      user: user.id
+    }
+    return await this.eventRepository.save(newEvent);
   }
 
   async updateEvent(eventId: number, user, eventData: UpdateEventDTO) {

@@ -1,0 +1,7 @@
+export enum ParticipantType {
+  REQUEST_SENT,
+  REQUEST_ACCEPTED,
+  REQUEST_REJECTED,
+  REQUEST_CANCELLED,
+  GOING
+}

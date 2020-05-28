@@ -4,6 +4,7 @@ import { Event } from './event.entity';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateEventDTO, UpdateEventDTO } from './event.dto';
+import { GetUser } from 'src/user/user.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('events')
@@ -21,17 +22,17 @@ export class EventController {
   }
 
   @Post()
-  createEvent(@Body(ValidationPipe) body: CreateEventDTO, @Request() req): Promise<Event> {
-    return this.eventService.createEvent(body);
+  createEvent(@Body(ValidationPipe) body: CreateEventDTO, @GetUser() user): Promise<Event> {
+    return this.eventService.createEvent(body, user);
   }
 
   @Patch(':event_id')
-  updateEvent(@Body() body: UpdateEventDTO, @Request() req, @Param() params) {
-    return this.eventService.updateEvent(+params.event_id, req.user, body);
+  updateEvent(@Body() body: UpdateEventDTO, @GetUser() user, @Param() params) {
+    return this.eventService.updateEvent(+params.event_id, user, body);
   }
 
   @Delete(':event_id')
-  deleteEvent(@Param() params, @Request() req) {
-    return this.eventService.deleteEvent(+params.event_id, req.user);
+  deleteEvent(@Param() params, @GetUser() user) {
+    return this.eventService.deleteEvent(+params.event_id, user);
   }
 }
