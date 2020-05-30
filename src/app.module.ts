@@ -11,8 +11,8 @@ import { AppService } from './app.service';
 
 import { EventModule } from './event/event.module';
 import { AuthModule } from './auth/auth.module';
-
 import { UserModule } from './user/user.module';
+import { ParticipiantsModule } from './participant/participant.module';
 
 @Module({
   imports: [
@@ -29,7 +29,8 @@ import { UserModule } from './user/user.module';
     }),
     AuthModule,
     EventModule,
-    UserModule
+    UserModule,
+    ParticipiantsModule
   ],
   controllers: [AppController],
   providers: [AppService],

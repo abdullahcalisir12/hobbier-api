@@ -1,8 +1,10 @@
-import { Controller, Get, Post, Delete, Param, UseGuards, Body, Request, Patch } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, UseGuards, Body, Request, Patch, ValidationPipe } from '@nestjs/common';
 import { EventService } from './event.service';
 import { Event } from './event.entity';
 
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { CreateEventDTO, UpdateEventDTO } from './event.dto';
+import { GetUser } from 'src/user/user.decorator';
 
 @UseGuards(JwtAuthGuard)
 @Controller('events')
@@ -20,24 +22,17 @@ export class EventController {
   }
 
   @Post()
-  createEvent(@Body() body, @Request() req): Promise<Event> {
-    const newEvent = {
-      name: body.name,
-      address: body.address,
-      description: body.description,
-      user: req.user
-    }
-    
-    return this.eventService.createEvent(newEvent);
+  createEvent(@Body(ValidationPipe) body: CreateEventDTO, @GetUser() user): Promise<Event> {
+    return this.eventService.createEvent(body, user);
   }
 
   @Patch(':event_id')
-  updateEvent(@Body() body, @Request() req, @Param() params) {
-    return this.eventService.updateEvent(+params.event_id, req.user, body);
+  updateEvent(@Body() body: UpdateEventDTO, @GetUser() user, @Param() params) {
+    return this.eventService.updateEvent(+params.event_id, user, body);
   }
 
   @Delete(':event_id')
-  deleteEvent(@Param() params, @Request() req) {
-    return this.eventService.deleteEvent(+params.event_id, req.user);
+  deleteEvent(@Param() params, @GetUser() user) {
+    return this.eventService.deleteEvent(+params.event_id, user);
   }
 }

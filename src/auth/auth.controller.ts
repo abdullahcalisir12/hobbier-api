@@ -7,7 +7,6 @@ import { SignUpDTO, SignInDTO } from './auth.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UseGuards(LocalAuthGuard)
   @Post('signin')
   signin(@Body(ValidationPipe) credentials: SignInDTO) {
     return this.authService.signIn(credentials);

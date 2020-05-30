@@ -1,7 +1,8 @@
-import { Injectable, BadRequestException, InternalServerErrorException, ConflictException } from '@nestjs/common';
+import { Injectable, BadRequestException, InternalServerErrorException, ConflictException, UnauthorizedException } from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import { JwtService } from '@nestjs/jwt';
 import { SignUpDTO, SignInDTO } from './auth.dto';
+import { User } from 'src/user/user.entitiy';
 
 @Injectable()
 export class AuthService {
@@ -10,37 +11,32 @@ export class AuthService {
     private jwtService: JwtService
   ){}
 
-  async signIn(credentials: SignInDTO) {
+  async signIn({username, password}: SignInDTO) {
     try {
-      return {
-        access_token: this.jwtService.sign(credentials)
-      };
+      const user = await this.validateUser(username, password);
+      if (user) {
+        return {
+          access_token: this.jwtService.sign(user)
+        };
+      }
     } catch (error) {
-      throw InternalServerErrorException;
-    } 
+      throw new InternalServerErrorException(error);
+    }
   }
 
-  signUp(credentials: SignUpDTO): Promise<any> {
-    try {
-      return this.userService.createUser(credentials);
-    } catch (error) {
-      if (error.code === '23505') {
-        throw new ConflictException('username is already been taken');
-      }
-      throw InternalServerErrorException;
-    }
+  signUp(credentials: SignUpDTO): Promise<User | undefined> {
+    return this.userService.createUser(credentials);
   }
 
   async validateUser(username: string, password: string): Promise<any> {
-    const user = await this.userService.getSingleUser({username});
-
-    if (user && user.password === password) {
-      const { password, ...result } = user;
-      return result;
+    const user = await this.userService.getUserByUserName(username);
+    if (user) {
+      const isPasswordMatched = await user.comparePassword(password);
+      if (isPasswordMatched) {
+        const { id, name, username} = user;
+        return { id, name, username };
+      }
     }
-    return null;
+    throw new BadRequestException('Invalid Credentials');
   }
 }
-
-
-// To do => use bcrypt later

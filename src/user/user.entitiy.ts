@@ -1,5 +1,6 @@
 import { Entity, Column, OneToMany, BeforeInsert } from "typeorm";
 import { Event } from '../event/event.entity';
+import { Participant } from "src/participant/participant.entity";
 
 import { AbstractEntity } from '../shared/abstract-entity';
 import { IsEmail } from "class-validator";
@@ -33,6 +34,9 @@ export class User extends AbstractEntity {
 
   @OneToMany(type => Event, event => event.user)
   events?: Event[];
+
+  @OneToMany(type => Participant, participant => participant.user)
+  participants?: Participant[];
 
   @BeforeInsert()
   async hashPassword() {
